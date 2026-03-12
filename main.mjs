@@ -37,6 +37,20 @@ Hooks.once("init", () => {
         default: "multi",
         onChange: (value) => Display.remoteSize(value)
     });
+    game.settings.register("mrkb-background-display", "position", {
+        name: "MRKB.DisplayPosition",
+        hint: "MRKB.DisplayPositionHint",
+        scope: "world",
+        config: true,
+        type: String,
+        choices: {
+            top: "MRKB.DisplayPositionTop",
+            center: "MRKB.DisplayPositionCenter",
+            bottom: "MRKB.DisplayPositionBottom"
+        },
+        default: "center",
+        onChange: (value) => Display.remotePosition(value)
+    });
 });
 Hooks.once("ready", () => {
     Display._create();
@@ -60,7 +74,7 @@ class Display {
 
         const display = document.createElement("div");
         display.id = "mrkb-display";
-        display.className = `${Display.getMode()} ${Display.getSize()}`;
+        this.setDisplayStyle({ display });
         display.append(backgroundImage, foregroundImage);
 
         document.querySelector("canvas#board").after(display);
@@ -136,8 +150,7 @@ class Display {
         game.settings.set("mrkb-background-display", "mode", mode);
     }
     static remoteMode(mode) {
-        const display = document.querySelector("#mrkb-display");
-        display.className = `${mode} ${Display.getSize()}`;
+        this.setDisplayStyle({ mode });
     }
     static getImage() {
         return game.settings.get("mrkb-background-display", "image");
@@ -158,8 +171,25 @@ class Display {
         game.settings.set("mrkb-background-display", "size", size);
     }
     static remoteSize(size) {
-        const display = document.querySelector("#mrkb-display");
-        display.className = `${Display.getMode()} ${size}`;
+        this.setDisplayStyle({ size });
+    }
+    static getPosition() {
+        return game.settings.get("mrkb-background-display", "position");
+    }
+    static setPosition(position) {
+        game.settings.set("mrkb-background-display", "position", position);
+    }
+    static remotePosition(position) {
+        this.setDisplayStyle({ position });
+    }
+    static setDisplayStyle({ display, mode, size, position, opacity } = {}) {
+        display ??= document.querySelector("#mrkb-display");
+        mode ??= this.getMode();
+        size ??= this.getSize();
+        position ??= this.getPosition();
+
+        display.className = `${mode} ${size} ${position}`;
+        display.style.opacity = opacity;
     }
 }
 

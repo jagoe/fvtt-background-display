@@ -53,3 +53,15 @@
 #mrkb-display.cover #display-image-foreground {
     object-fit: cover;
 }
+#mrkb-display.top #display-image-background {
+    object-position: top;
+}
+#mrkb-display.bottom #display-image-background {
+    object-position: bottom;
+}
+#mrkb-display.top #display-image-foreground {
+    object-position: top;
+}
+#mrkb-display.bottom #display-image-foreground {
+    object-position: bottom;
+}
