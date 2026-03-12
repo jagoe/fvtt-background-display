@@ -63,7 +63,7 @@ class Display {
         display.className = `${Display.getMode()} ${Display.getSize()}`;
         display.append(backgroundImage, foregroundImage);
 
-        document.querySelector("canvas#board").after (display);
+        document.querySelector("canvas#board").after(display);
     }
     static getControlButtons(sceneControls) {
         const tools = {
@@ -107,9 +107,14 @@ class Display {
                 button: true,
                 onChange: () => Display.setImage("")
             }
-        }
+        };
         Hooks.call("getDisplayControlButtons", tools);
-        const activeTool = Display.getMode() === "image" ? "visible" : Display.getMode() === "off" ? "invisible" : "background";
+        const activeTool =
+            Display.getMode() === "image"
+                ? "visible"
+                : Display.getMode() === "off"
+                  ? "invisible"
+                  : "background";
         sceneControls.display = {
             name: "display",
             title: "MRKB.Display",
@@ -142,7 +147,9 @@ class Display {
     }
     static remoteImage(src) {
         const target = document.querySelectorAll(`.display-image`);
-        target.forEach((t) => {t.src = src});
+        target.forEach((t) => {
+            t.src = src;
+        });
     }
     static getSize() {
         return game.settings.get("mrkb-background-display", "size");
@@ -156,16 +163,17 @@ class Display {
     }
 }
 
-
 class ImageBrowser extends foundry.applications.apps.FilePicker.implementation {
-    constructor(options = {
-        id: "file-picker",
-        type: "image",
-        popOut: true,
-        activeSource: "data",
-        galleryMode: "thumbs",
-        callback: (path) => Display.setImage(path)
-    }) {
+    constructor(
+        options = {
+            id: "file-picker",
+            type: "image",
+            popOut: true,
+            activeSource: "data",
+            galleryMode: "thumbs",
+            callback: (path) => Display.setImage(path)
+        }
+    ) {
         super(options);
         this.targetId = options.id;
     }
