@@ -51,6 +51,20 @@ Hooks.once("init", () => {
         default: "center",
         onChange: (value) => Display.remotePosition(value)
     });
+    game.settings.register("mrkb-background-display", "opacity", {
+        name: "MRKB.DisplayOpacity",
+        hint: "MRKB.DisplayOpacityHint",
+        scope: "world",
+        config: true,
+        type: Number,
+        default: 0.2,
+        range: {
+            min: 0,
+            step: 0.01,
+            max: 1
+        },
+        onChange: (value) => Display.remoteOpacity(value)
+    });
 });
 Hooks.once("ready", () => {
     Display._create();
@@ -182,14 +196,24 @@ class Display {
     static remotePosition(position) {
         this.setDisplayStyle({ position });
     }
+    static getOpacity() {
+        return game.settings.get("mrkb-background-display", "opacity");
+    }
+    static setOpacity(opacity) {
+        game.settings.set("mrkb-background-display", "opacity", opacity);
+    }
+    static remoteOpacity(opacity) {
+        this.setDisplayStyle({ opacity });
+    }
     static setDisplayStyle({ display, mode, size, position, opacity } = {}) {
         display ??= document.querySelector("#mrkb-display");
         mode ??= this.getMode();
         size ??= this.getSize();
         position ??= this.getPosition();
+        opacity ??= this.getOpacity();
 
         display.className = `${mode} ${size} ${position}`;
-        display.style.opacity = opacity;
+        display.style.setProperty("--image-opacity", opacity);
     }
 }
 
