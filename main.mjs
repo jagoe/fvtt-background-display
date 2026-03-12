@@ -79,19 +79,22 @@ class Display {
         const backgroundImage = document.createElement("img");
         backgroundImage.id = "display-image-background";
         backgroundImage.className = "display-image";
-        backgroundImage.src = Display.getImage();
+        backgroundImage.src = this.getImage();
 
         const foregroundImage = document.createElement("img");
         foregroundImage.id = "display-image-foreground";
         foregroundImage.className = "display-image";
-        foregroundImage.src = Display.getImage();
+        foregroundImage.src = this.getImage();
 
         const display = document.createElement("div");
         display.id = "mrkb-display";
-        this.setDisplayStyle({ display });
+        this.#setDisplayStyle({ display });
         display.append(backgroundImage, foregroundImage);
 
         document.querySelector("canvas#board").after(display);
+
+        const module = game.modules.get("mrkb-background-display");
+        module.API = this.#getApi();
     }
     static getControlButtons(sceneControls) {
         const tools = {
@@ -100,24 +103,24 @@ class Display {
                 title: "MRKB.VisibleDisplay",
                 icon: "fa-solid fa-eye",
                 order: 1,
-                active: Display.getMode() === "image",
-                onChange: () => Display.setMode("image")
+                active: this.getMode() === "image",
+                onChange: () => this.setMode("image")
             },
             invisible: {
                 name: "invisible",
                 title: "MRKB.InvisibleDisplay",
                 icon: "fa-solid fa-eye-slash",
                 order: 2,
-                active: Display.getMode() === "off",
-                onChange: () => Display.setMode("off")
+                active: this.getMode() === "off",
+                onChange: () => this.setMode("off")
             },
             background: {
                 name: "background",
                 title: "MRKB.BackgroundDisplay",
                 icon: "fa-solid fa-image-portrait",
                 order: 3,
-                active: Display.getMode() === "background",
-                onChange: () => Display.setMode("background")
+                active: this.getMode() === "background",
+                onChange: () => this.setMode("background")
             },
             browser: {
                 name: "browser",
@@ -125,7 +128,7 @@ class Display {
                 icon: "fa-solid fa-folder",
                 order: 98,
                 button: true,
-                onChange: () => Display.openImageBrowser()
+                onChange: () => this.#openImageBrowser()
             },
             remove: {
                 name: "remove",
@@ -133,14 +136,14 @@ class Display {
                 icon: "fa-solid fa-trash",
                 order: 99,
                 button: true,
-                onChange: () => Display.setImage("")
+                onChange: () => this.setImage("")
             }
         };
         Hooks.call("getDisplayControlButtons", tools);
         const activeTool =
-            Display.getMode() === "image"
+            this.getMode() === "image"
                 ? "visible"
-                : Display.getMode() === "off"
+                : this.getMode() === "off"
                   ? "invisible"
                   : "background";
         sceneControls.display = {
@@ -153,7 +156,7 @@ class Display {
             onChange: (event, active) => {}
         };
     }
-    static openImageBrowser() {
+    static #openImageBrowser() {
         const filePicker = new ImageBrowser();
         filePicker.render();
     }
@@ -164,7 +167,7 @@ class Display {
         game.settings.set("mrkb-background-display", "mode", mode);
     }
     static remoteMode(mode) {
-        this.setDisplayStyle({ mode });
+        this.#setDisplayStyle({ mode });
     }
     static getImage() {
         return game.settings.get("mrkb-background-display", "image");
@@ -185,7 +188,7 @@ class Display {
         game.settings.set("mrkb-background-display", "size", size);
     }
     static remoteSize(size) {
-        this.setDisplayStyle({ size });
+        this.#setDisplayStyle({ size });
     }
     static getPosition() {
         return game.settings.get("mrkb-background-display", "position");
@@ -194,7 +197,7 @@ class Display {
         game.settings.set("mrkb-background-display", "position", position);
     }
     static remotePosition(position) {
-        this.setDisplayStyle({ position });
+        this.#setDisplayStyle({ position });
     }
     static getOpacity() {
         return game.settings.get("mrkb-background-display", "opacity");
@@ -203,9 +206,9 @@ class Display {
         game.settings.set("mrkb-background-display", "opacity", opacity);
     }
     static remoteOpacity(opacity) {
-        this.setDisplayStyle({ opacity });
+        this.#setDisplayStyle({ opacity });
     }
-    static setDisplayStyle({ display, mode, size, position, opacity } = {}) {
+    static #setDisplayStyle({ display, mode, size, position, opacity } = {}) {
         display ??= document.querySelector("#mrkb-display");
         mode ??= this.getMode();
         size ??= this.getSize();
@@ -214,6 +217,21 @@ class Display {
 
         display.className = `${mode} ${size} ${position}`;
         display.style.setProperty("--image-opacity", opacity);
+    }
+
+    static #getApi() {
+        return {
+            getMode: this.getMode,
+            setMode: this.setMode,
+            getImage: this.getImage,
+            setImage: this.setImage,
+            getSize: this.getSize,
+            setSize: this.setSize,
+            getPosition: this.getPosition,
+            setPosition: this.setPosition,
+            getOpacity: this.getOpacity,
+            setOpacity: this.setOpacity
+        };
     }
 }
 
